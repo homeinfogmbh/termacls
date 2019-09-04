@@ -27,6 +27,9 @@ class TermaclsModel(Model):
 class TypeAdmin(TermaclsModel):
     """Administrators of certain deployment types."""
 
+    class Meta:     # pylint: disable=C0111,R0903
+        table_name = 'type_admin'
+
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
     type = EnumField(Type)
@@ -34,6 +37,9 @@ class TypeAdmin(TermaclsModel):
 
 class ManufacturerAdmin(TermaclsModel):
     """Administrators of certain system manufacturers."""
+
+    class Meta:     # pylint: disable=C0111,R0903
+        table_name = 'manufacturer_admin'
 
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
