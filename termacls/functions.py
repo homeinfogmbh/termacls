@@ -70,8 +70,9 @@ def can_deploy(account, system, deployment):
     if not can_administer_system(account, system):
         return False
 
-    if not can_administer_deployment(account, deployment):
-        return False
+    if deployment is not None:
+        if not can_administer_deployment(account, deployment):
+            return False
 
     if system.deployment is not None:
         if not can_administer_deployment(account, system.deployment):
