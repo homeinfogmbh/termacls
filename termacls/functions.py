@@ -10,6 +10,7 @@ from termacls.orm import TypeAdmin, ManufacturerAdmin
 __all__ = [
     'can_administer_deployment',
     'can_administer_system',
+    'can_deploy',
     'can_setup_system',
     'get_administerable_deployments',
     'get_administerable_systems',
@@ -32,7 +33,7 @@ def can_administer_deployment(account, deployment):
 
     try:
         TypeAdmin.get(
-            (TypeAdmin.account == account)
+            (TypeAdmin.account == account.id)
             & (TypeAdmin.type == deployment.type))
     except TypeAdmin.DoesNotExist:
         LOGGER.debug(
@@ -53,12 +54,30 @@ def can_administer_system(account, system):
 
     try:
         ManufacturerAdmin.get(
-            (ManufacturerAdmin.account == account)
+            (ManufacturerAdmin.account == account.id)
             & (ManufacturerAdmin.manufacturer == system.manufacturer))
     except ManufacturerAdmin.DoesNotExist:
         LOGGER.debug(
             'Account "%s" can not administer system "%s".', account, system)
         return False
+
+    return True
+
+
+def can_deploy(account, system, deployment):
+    """Checks whether the account can deployment
+    the respective system at the given deployment.
+    """
+
+    if not can_administer_system(account, system):
+        return False
+
+    if not can_administer_deployment(account, deployment):
+        return False
+
+    if system.deployment is not None:
+        if not can_administer_deployment(account, system.deployment):
+            return False
 
     return True
 
@@ -79,7 +98,7 @@ def get_administerable_deployments(account):
         return Deployment
 
     return Deployment.select().join(TypeAdmin, on=DEP_TYPEADM_JOIN).where(
-        TypeAdmin.account == account)
+        TypeAdmin.account == account.id)
 
 
 def get_administerable_systems(account):
@@ -89,7 +108,7 @@ def get_administerable_systems(account):
         return System
 
     return System.select().join(ManufacturerAdmin, on=SYSTEM_MANU_JOIN).where(
-        ManufacturerAdmin.account == account)
+        ManufacturerAdmin.account == account.id)
 
 
 def get_setupable_systems(account):
