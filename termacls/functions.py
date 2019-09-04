@@ -18,8 +18,6 @@ __all__ = [
 ]
 
 
-DEP_TYPEADM_JOIN = Deployment.type == TypeAdmin.type
-SYSTEM_MANU_JOIN = System.manufacturer == ManufacturerAdmin.manufacturer
 LOGGER = getLogger('termacls')
 
 
@@ -97,8 +95,9 @@ def get_administerable_deployments(account):
     if account.root:
         return Deployment
 
-    return Deployment.select().join(TypeAdmin, on=DEP_TYPEADM_JOIN).where(
-        TypeAdmin.account == account.id)
+    types = {type_admin.type for type_admin in TypeAdmin.select().where(
+        TypeAdmin.account == account.id)}
+    return Deployment.select().where(Deployment.type << types)
 
 
 def get_administerable_systems(account):
@@ -107,8 +106,11 @@ def get_administerable_systems(account):
     if account.root:
         return System
 
-    return System.select().join(ManufacturerAdmin, on=SYSTEM_MANU_JOIN).where(
-        ManufacturerAdmin.account == account.id)
+    manufacturers = {
+        manufacturer_admin.manufacturer for manufacturer_admin in
+        ManufacturerAdmin.select().where(
+            ManufacturerAdmin.account == account.id)}
+    return System.select().where(System.manufacturer << manufacturers)
 
 
 def get_setupable_systems(account):
