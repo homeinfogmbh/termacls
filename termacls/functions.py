@@ -96,7 +96,7 @@ def can_setup_system(account, system):
     except ManufacturerAdmin.DoesNotExist:
         return False
 
-    return manufacturer_admin.customer == system.manufacturer
+    return manufacturer_admin.manufacturer == system.manufacturer
 
 
 def get_administerable_deployments(account):
