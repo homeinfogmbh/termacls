@@ -93,9 +93,7 @@ def can_setup_system(account, system):
     manufacturers = {
         manufacturer_admin.manufacturer for manufacturer_admin
         in ManufacturerAdmin.select().where(
-            ManufacturerAdmin.account == account.id)
-    }
-
+            ManufacturerAdmin.account == account.id)}
     return system.manufacturer in manufacturers
 
 
