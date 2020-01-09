@@ -90,12 +90,13 @@ def can_setup_system(account, system):
     if account.customer == system.manufacturer:
         return True
 
-    for manufacturer_admin in ManufacturerAdmin.select(
-            ManufacturerAdmin.account == account.id):
-        if manufacturer_admin.manufacturer == system.manufacturer:
-            return True
+    manufacturers = {
+        manufacturer_admin.manufacturer for manufacturer_admin
+        in ManufacturerAdmin.select().where(
+            ManufacturerAdmin.account == account.id)
+    }
 
-    return False
+    return system.manufacturer in manufacturers
 
 
 def get_administerable_deployments(account):
