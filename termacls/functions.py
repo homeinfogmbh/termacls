@@ -2,7 +2,8 @@
 
 from logging import getLogger
 
-from terminallib import Deployment, System
+from mdb import Customer
+from terminallib import Deployment, System, Type
 
 from termacls.orm import TypeAdmin, ManufacturerAdmin
 
@@ -26,20 +27,7 @@ def can_administer_deployment(account, deployment):
     may administer the given deployment.
     """
 
-    if account.root:
-        return True
-
-    try:
-        TypeAdmin.get(
-            (TypeAdmin.account == account.id)
-            & (TypeAdmin.type == deployment.type))
-    except TypeAdmin.DoesNotExist:
-        LOGGER.debug(
-            'Account "%s" can not administer deployment "%s".', account,
-            deployment)
-        return False
-
-    return True
+    return deployment in get_administerable_deployments(account)
 
 
 def can_administer_system(account, system):
@@ -47,19 +35,7 @@ def can_administer_system(account, system):
     may administer the given system.
     """
 
-    if account.root:
-        return True
-
-    try:
-        ManufacturerAdmin.get(
-            (ManufacturerAdmin.account == account.id)
-            & (ManufacturerAdmin.manufacturer == system.manufacturer))
-    except ManufacturerAdmin.DoesNotExist:
-        LOGGER.debug(
-            'Account "%s" can not administer system "%s".', account, system)
-        return False
-
-    return True
+    return system in get_administerable_systems(account)
 
 
 def can_deploy(account, system, deployment):
@@ -90,11 +66,19 @@ def can_setup_system(account, system):
     if account.customer == system.manufacturer:
         return True
 
-    manufacturers = {
-        manufacturer_admin.manufacturer for manufacturer_admin
-        in ManufacturerAdmin.select().where(
-            ManufacturerAdmin.account == account.id)}
-    return system.manufacturer in manufacturers
+    return system in get_setupable_systems(account)
+
+
+def get_admin_types(account):
+    """Returns a set of administrerable types for the given account."""
+
+    if account.root:
+        return Type
+
+    return {
+        type_admin.type for type_admin in TypeAdmin.select().where(
+            TypeAdmin.account == account.id)
+    }
 
 
 def get_administerable_deployments(account):
@@ -103,9 +87,21 @@ def get_administerable_deployments(account):
     if account.root:
         return Deployment
 
-    types = {type_admin.type for type_admin in TypeAdmin.select().where(
-        TypeAdmin.account == account.id)}
+    types = get_admin_types(account)
     return Deployment.select().where(Deployment.type << types)
+
+
+def get_admin_manufacturers(account):
+    """Yields manufacturers, which the given account can administer."""
+
+    if account.root:
+        return Customer
+
+    return {
+        manufacturer_admin.manufacturer for manufacturer_admin in
+        ManufacturerAdmin.select().where(
+            ManufacturerAdmin.account == account.id)
+    }
 
 
 def get_administerable_systems(account):
@@ -114,11 +110,10 @@ def get_administerable_systems(account):
     if account.root:
         return System
 
-    manufacturers = {
-        manufacturer_admin.manufacturer for manufacturer_admin in
-        ManufacturerAdmin.select().where(
-            ManufacturerAdmin.account == account.id)}
-    return System.select().where(System.manufacturer << manufacturers)
+    select = System.select().join(Deployment)
+    condition = System.manufacturer << get_admin_manufacturers(account)
+    condition |= Deployment.type << get_admin_types(account)
+    return select.where(condition)
 
 
 def get_setupable_systems(account):
