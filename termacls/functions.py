@@ -112,7 +112,7 @@ def get_administerable_systems(account):
     if account.root:
         return System.select().where(True)
 
-    select = System.select().join(Deployment, join_type=JOIN.LEFT)
+    select = System.select().join(Deployment, join_type=JOIN.LEFT_OUTER)
     condition = System.manufacturer << set(get_admin_manufacturers(account))
     condition |= Deployment.type << set(get_admin_types(account))
     return select.where(condition)
