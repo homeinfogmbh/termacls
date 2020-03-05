@@ -94,7 +94,7 @@ def get_administerable_deployments(account):
     if account.root:
         return Deployment.select().where(True)
 
-    types = get_admin_types(account)
+    types = set(get_admin_types(account))
     return Deployment.select().where(Deployment.type << types)
 
 
