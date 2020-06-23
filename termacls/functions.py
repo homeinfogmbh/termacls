@@ -101,6 +101,8 @@ def get_administerable_deployments(account):
 def get_admin_manufacturers(account):
     """Yields manufacturers, which the given account can administer."""
 
+    yield account.customer
+
     for manufacturer_admin in ManufacturerAdmin.select().where(
             ManufacturerAdmin.account == account.id):
         yield manufacturer_admin.manufacturer
@@ -125,5 +127,4 @@ def get_setupable_systems(account):
         return System.select().where(True)
 
     manufacturers = set(get_admin_manufacturers(account))
-    manufacturers.add(account.customer)
     return System.select().where(System.manufacturer << manufacturers)
