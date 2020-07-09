@@ -4,7 +4,7 @@ from logging import getLogger
 
 from peewee import JOIN
 
-from terminallib import Deployment, System
+from hwdb import Deployment, System
 
 from termacls.orm import TypeAdmin, ManufacturerAdmin
 
