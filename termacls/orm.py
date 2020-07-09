@@ -3,9 +3,9 @@
 from peewee import ForeignKeyField, Model
 
 from his import Account
+from hwdb import Type
 from mdb import Customer
 from peeweeplus import EnumField, MySQLDatabase
-from terminallib import Type
 
 from termacls.config import CONFIG
 
