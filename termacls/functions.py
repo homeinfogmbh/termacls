@@ -109,14 +109,18 @@ def get_admin_manufacturers(account):
 
 
 def get_administerable_systems(account):
-    """Yields systems that the given account can administer."""
+    """Yields systems with deployments that
+    the given account can administer.
+    """
+
+    select = System.depjoin(join_type=JOIN.LEFT_OUTER)
 
     if account.root:
-        return System.select().where(True)
+        return select.where(True)
 
     condition = System.manufacturer << set(get_admin_manufacturers(account))
     condition |= Deployment.type << set(get_admin_types(account))
-    return System.depjoin(join_type=JOIN.LEFT_OUTER).where(condition)
+    return select.where(condition)
 
 
 def get_setupable_systems(account):
