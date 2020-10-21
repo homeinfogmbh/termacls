@@ -4,13 +4,12 @@ from peewee import ForeignKeyField, Model
 
 from his import Account
 from hwdb import Type
-from mdb import Customer
 from peeweeplus import EnumField, MySQLDatabase
 
 from termacls.config import CONFIG
 
 
-__all__ = ['TypeAdmin', 'ManufacturerAdmin']
+__all__ = ['TypeAdmin']
 
 
 DATABASE = MySQLDatabase.from_config(CONFIG['db'])
@@ -33,15 +32,3 @@ class TypeAdmin(TermaclsModel):
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
     type = EnumField(Type)
-
-
-class ManufacturerAdmin(TermaclsModel):
-    """Administrators of certain system manufacturers."""
-
-    class Meta:     # pylint: disable=C0111,R0903
-        table_name = 'manufacturer_admin'
-
-    account = ForeignKeyField(
-        Account, column_name='account', on_delete='CASCADE')
-    manufacturer = ForeignKeyField(
-        Customer, column_name='manufacturer', on_delete='CASCADE')
