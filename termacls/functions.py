@@ -2,8 +2,6 @@
 
 from logging import getLogger
 
-from peewee import JOIN
-
 from hwdb import Deployment, System
 
 from termacls.orm import TypeAdmin
@@ -69,9 +67,8 @@ def can_deploy(account, system, deployment):
 def get_admin_types(account):
     """Returns a set of administrerable types for the given account."""
 
-    for type_admin in TypeAdmin.select().where(
-            TypeAdmin.account == account.id):
-        yield type_admin.type
+    for record in TypeAdmin.select().where(TypeAdmin.account == account.id):
+        yield record.type
 
 
 def get_administerable_deployments(account):
@@ -89,10 +86,7 @@ def get_administerable_systems(account):
     the given account can administer.
     """
 
-    select = System.depjoin(join_type=JOIN.LEFT_OUTER)
-
     if account.root:
-        return select.where(True)
+        return System.select().where(True)
 
-    condition = Deployment.type << set(get_admin_types(account))
-    return select.where(condition)
+    return System.select().where(System.operator == account.customer)
