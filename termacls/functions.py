@@ -11,7 +11,9 @@ __all__ = [
     'can_administer_deployment',
     'can_administer_system',
     'can_deploy',
+    'get_deployment_admin_condition',
     'get_administerable_deployments',
+    'get_system_admin_condition',
     'get_administerable_systems'
 ]
 
@@ -71,14 +73,28 @@ def get_admin_types(account):
         yield record.type
 
 
+def get_deployment_admin_condition(account):
+    """Returns the condition to adminster deployments."""
+
+    if account.root:
+        return True
+
+    return Deployment.type << set(get_admin_types(account))
+
+
 def get_administerable_deployments(account):
     """Yields deployments that the given account can administer."""
 
-    if account.root:
-        return Deployment.select().where(True)
+    return Deployment.select().where(get_deployment_admin_condition(account))
 
-    types = set(get_admin_types(account))
-    return Deployment.select().where(Deployment.type << types)
+
+def get_system_admin_condition(account):
+    """Returns the condition to administer systems."""
+
+    if account.root:
+        return True
+
+    return System.operator == account.customer
 
 
 def get_administerable_systems(account):
@@ -86,7 +102,4 @@ def get_administerable_systems(account):
     the given account can administer.
     """
 
-    if account.root:
-        return System.select().where(True)
-
-    return System.select().where(System.operator == account.customer)
+    return System.select().where(get_system_admin_condition(account))
