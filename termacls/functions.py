@@ -1,8 +1,12 @@
 """Authentication check functions."""
 
 from logging import getLogger
+from typing import Generator, Iterable
 
-from hwdb import Deployment, System
+from peewee import Expression
+
+from his import Account
+from hwdb import Deployment, DeploymentType, System
 
 from termacls.orm import TypeAdmin
 
@@ -21,7 +25,8 @@ __all__ = [
 LOGGER = getLogger('termacls')
 
 
-def can_administer_deployment(account, deployment):
+def can_administer_deployment(account: Account,
+                              deployment: Deployment) -> bool:
     """Checks whether the respective account
     may administer the given deployment.
     """
@@ -34,7 +39,7 @@ def can_administer_deployment(account, deployment):
         return False
 
 
-def can_administer_system(account, system):
+def can_administer_system(account: Account, system: System) -> bool:
     """Checks whether the respective account
     may administer the given system.
     """
@@ -47,7 +52,8 @@ def can_administer_system(account, system):
         return False
 
 
-def can_deploy(account, system, deployment):
+def can_deploy(account: Account, system: System,
+               deployment: Deployment) -> bool:
     """Checks whether the account can deployment
     the respective system at the given deployment.
     """
@@ -66,14 +72,14 @@ def can_deploy(account, system, deployment):
     return True
 
 
-def get_admin_types(account):
+def get_admin_types(account: Account) -> Generator[DeploymentType, None, None]:
     """Returns a set of administrerable types for the given account."""
 
     for record in TypeAdmin.select().where(TypeAdmin.account == account.id):
         yield record.type
 
 
-def get_deployment_admin_condition(account):
+def get_deployment_admin_condition(account: Account) -> Expression:
     """Returns the condition to adminster deployments."""
 
     if account.root:
@@ -82,13 +88,13 @@ def get_deployment_admin_condition(account):
     return Deployment.type << set(get_admin_types(account))
 
 
-def get_administerable_deployments(account):
+def get_administerable_deployments(account: Account) -> Iterable[Deployment]:
     """Yields deployments that the given account can administer."""
 
     return Deployment.select().where(get_deployment_admin_condition(account))
 
 
-def get_system_admin_condition(account):
+def get_system_admin_condition(account: Account) -> Expression:
     """Returns the condition to administer systems."""
 
     if account.root:
@@ -97,7 +103,7 @@ def get_system_admin_condition(account):
     return System.operator == account.customer
 
 
-def get_administerable_systems(account):
+def get_administerable_systems(account: Account) -> Iterable[System]:
     """Yields systems with deployments that
     the given account can administer.
     """

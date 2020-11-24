@@ -3,7 +3,7 @@
 from peewee import ForeignKeyField, Model
 
 from his import Account
-from hwdb import Type
+from hwdb import DeploymentType
 from peeweeplus import EnumField, MySQLDatabase
 
 from termacls.config import CONFIG
@@ -31,4 +31,4 @@ class TypeAdmin(TermaclsModel):
 
     account = ForeignKeyField(
         Account, column_name='account', on_delete='CASCADE')
-    type = EnumField(Type)
+    type = EnumField(DeploymentType)
