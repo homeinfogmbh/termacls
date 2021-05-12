@@ -1,14 +1,14 @@
 """Authentication check functions."""
 
 from logging import getLogger
-from typing import Generator, Iterable
+from typing import Generator, Iterable, Iterator
 
 from peewee import Expression
 
 from his import Account
-from hwdb import Deployment, DeploymentType, System
+from hwdb import Deployment, DeploymentType, Group, System
 
-from termacls.orm import TypeAdmin
+from termacls.orm import GroupAdmin, TypeAdmin
 
 
 __all__ = [
@@ -94,13 +94,20 @@ def get_administerable_deployments(account: Account) -> Iterable[Deployment]:
     return Deployment.select().where(get_deployment_admin_condition(account))
 
 
+def get_admin_groups(account: Account) -> Iterator[Group]:
+    """Yields groups the account is a member of."""
+
+    for record in GroupAdmin.select().where(GroupAdmin.account == account):
+        yield record.group
+
+
 def get_system_admin_condition(account: Account) -> Expression:
     """Returns the condition to administer systems."""
 
     if account.root:
         return True
 
-    return System.operator == account.customer
+    return System.group << set(get_admin_groups(account))
 
 
 def get_administerable_systems(account: Account) -> Iterable[System]:
