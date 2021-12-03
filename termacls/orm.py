@@ -4,15 +4,13 @@ from peewee import ForeignKeyField, Model
 
 from his import Account
 from hwdb import DeploymentType, Group
-from peeweeplus import EnumField, MySQLDatabase
-
-from termacls.config import CONFIG
+from peeweeplus import EnumField, MySQLDatabaseProxy
 
 
 __all__ = ['GroupAdmin', 'TypeAdmin']
 
 
-DATABASE = MySQLDatabase.from_config(CONFIG['db'])
+DATABASE = MySQLDatabaseProxy('termacls')
 
 
 class TermaclsModel(Model):
