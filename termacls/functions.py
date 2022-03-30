@@ -106,7 +106,7 @@ def get_admin_groups(account: Account) -> Iterator[Group]:
         yield record.group
 
 
-def get_system_admin_condition(account: Account) -> Expression:
+def get_system_admin_condition(account: Account) -> Expression | bool:
     """Returns the condition to administer systems."""
 
     if account.root:
