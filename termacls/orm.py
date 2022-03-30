@@ -16,7 +16,7 @@ DATABASE = MySQLDatabaseProxy('termacls')
 class TermaclsModel(Model):
     """Base model for the termacl database."""
 
-    class Meta:     # pylint: disable=C0111,R0903
+    class Meta:
         database = DATABASE
         schema = database.database
 
@@ -24,20 +24,22 @@ class TermaclsModel(Model):
 class GroupAdmin(TermaclsModel):
     """Administrators of certain hardware database groups."""
 
-    class Meta:     # pylint: disable=C0111,R0903
+    class Meta:
         table_name = 'group_admin'
 
     account = ForeignKeyField(
-        Account, column_name='account', on_delete='CASCADE')
+        Account, column_name='account', on_delete='CASCADE'
+    )
     group = ForeignKeyField(Group, column_name='group', on_delete='CASCADE')
 
 
 class TypeAdmin(TermaclsModel):
     """Administrators of certain deployment types."""
 
-    class Meta:     # pylint: disable=C0111,R0903
+    class Meta:
         table_name = 'type_admin'
 
     account = ForeignKeyField(
-        Account, column_name='account', on_delete='CASCADE')
+        Account, column_name='account', on_delete='CASCADE'
+    )
     type = EnumField(DeploymentType)

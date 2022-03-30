@@ -25,8 +25,10 @@ __all__ = [
 LOGGER = getLogger('termacls')
 
 
-def can_administer_deployment(account: Account,
-                              deployment: Deployment) -> bool:
+def can_administer_deployment(
+        account: Account,
+        deployment: Deployment
+) -> bool:
     """Checks whether the respective account
     may administer the given deployment.
     """
@@ -52,8 +54,11 @@ def can_administer_system(account: Account, system: System) -> bool:
         return False
 
 
-def can_deploy(account: Account, system: System,
-               deployment: Deployment) -> bool:
+def can_deploy(
+        account: Account,
+        system: System,
+        deployment: Deployment
+) -> bool:
     """Checks whether the account can deployment
     the respective system at the given deployment.
     """
