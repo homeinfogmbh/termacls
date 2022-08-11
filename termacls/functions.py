@@ -78,14 +78,16 @@ def can_deploy(
 
 
 def get_admin_types(account: Account) -> Generator[DeploymentType, None, None]:
-    """Returns a set of administrerable types for the given account."""
+    """Returns a set of types for the given
+    account that they can administer.
+    """
 
     for record in TypeAdmin.select().where(TypeAdmin.account == account.id):
         yield record.type
 
 
 def get_deployment_admin_condition(account: Account) -> Expression:
-    """Returns the condition to adminster deployments."""
+    """Returns the condition to administer deployments."""
 
     if account.root:
         return True
