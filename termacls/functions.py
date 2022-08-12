@@ -1,9 +1,9 @@
 """Authentication check functions."""
 
 from logging import getLogger
-from typing import Generator, Iterable, Iterator
+from typing import Iterator, Union
 
-from peewee import Expression
+from peewee import Expression, ModelSelect
 
 from his import Account
 from hwdb import Deployment, DeploymentType, Group, System
@@ -78,7 +78,7 @@ def can_deploy(
     return True
 
 
-def get_admin_types(account: Account) -> Generator[DeploymentType, None, None]:
+def get_admin_types(account: Account) -> Iterator[DeploymentType]:
     """Returns a set of types for the given
     account that they can administer.
     """
@@ -87,7 +87,9 @@ def get_admin_types(account: Account) -> Generator[DeploymentType, None, None]:
         yield record.type
 
 
-def get_deployment_admin_condition(account: Account) -> Expression:
+def get_deployment_admin_condition(
+        account: Account
+) -> Union[Expression, bool]:
     """Returns the condition to administer deployments."""
 
     if account.root:
@@ -96,7 +98,7 @@ def get_deployment_admin_condition(account: Account) -> Expression:
     return Deployment.type << set(get_admin_types(account))
 
 
-def get_administerable_deployments(account: Account) -> Iterable[Deployment]:
+def get_administerable_deployments(account: Account) -> ModelSelect:
     """Yields deployments that the given account can administer."""
 
     return Deployment.select().where(get_deployment_admin_condition(account))
@@ -109,7 +111,7 @@ def get_admin_groups(account: Account) -> Iterator[Group]:
         yield record.group
 
 
-def get_system_admin_condition(account: Account) -> Expression | bool:
+def get_system_admin_condition(account: Account) -> Union[Expression, bool]:
     """Returns the condition to administer systems."""
 
     if account.root:
@@ -118,7 +120,7 @@ def get_system_admin_condition(account: Account) -> Expression | bool:
     return System.group << set(get_admin_groups(account))
 
 
-def get_administerable_systems(account: Account) -> Iterable[System]:
+def get_administerable_systems(account: Account) -> ModelSelect:
     """Yields systems with deployments that
     the given account can administer.
     """
@@ -126,7 +128,7 @@ def get_administerable_systems(account: Account) -> Iterable[System]:
     return System.select().where(get_system_admin_condition(account))
 
 
-def get_administerable_groups(account: Account) -> Iterable[Group]:
+def get_administerable_groups(account: Account) -> ModelSelect:
     """Yield groups that can be administered by the given account."""
 
     if account.root:
