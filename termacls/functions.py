@@ -18,7 +18,8 @@ __all__ = [
     'get_deployment_admin_condition',
     'get_administerable_deployments',
     'get_system_admin_condition',
-    'get_administerable_systems'
+    'get_administerable_systems',
+    'get_administerable_groups'
 ]
 
 
@@ -123,3 +124,14 @@ def get_administerable_systems(account: Account) -> Iterable[System]:
     """
 
     return System.select().where(get_system_admin_condition(account))
+
+
+def get_administerable_groups(account: Account) -> Iterable[Group]:
+    """Yield groups that can be administered by the given account."""
+
+    if account.root:
+        return Group.select().where(True)
+
+    return Group.select().join(GroupAdmin).where(
+        GroupAdmin.account == account.id
+    )
