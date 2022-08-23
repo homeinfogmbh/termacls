@@ -104,7 +104,7 @@ def get_administerable_deployments(account: Account) -> ModelSelect:
     return Deployment.select().where(get_deployment_admin_condition(account))
 
 
-def get_admin_groups(account: Account) -> Iterator[Group]:
+def get_admin_groups(account: Account) -> Iterator[int]:
     """Yields groups the account is a member of."""
 
     for record in GroupAdmin.select().where(GroupAdmin.account == account):
