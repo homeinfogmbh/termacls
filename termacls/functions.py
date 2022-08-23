@@ -34,10 +34,10 @@ def can_administer_deployment(
     may administer the given deployment.
     """
 
-    deployments = get_administerable_deployments(account)
-
     try:
-        return deployments.where(Deployment.id == deployment).get()
+        return get_administerable_deployments(account).where(
+            Deployment.id == deployment
+        ).get()
     except Deployment.DoesNotExist:
         return False
 
@@ -47,10 +47,10 @@ def can_administer_system(account: Account, system: System) -> bool:
     may administer the given system.
     """
 
-    systems = get_administerable_systems(account)
-
     try:
-        return systems.where(System.id == system).get()
+        return get_administerable_systems(account).where(
+            System.id == system
+        ).get()
     except System.DoesNotExist:
         return False
 
