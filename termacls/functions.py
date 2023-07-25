@@ -12,32 +12,31 @@ from termacls.orm import GroupAdmin, TypeAdmin
 
 
 __all__ = [
-    'can_administer_deployment',
-    'can_administer_system',
-    'can_deploy',
-    'get_deployment_admin_condition',
-    'get_administerable_deployments',
-    'get_system_admin_condition',
-    'get_administerable_systems',
-    'get_administerable_groups'
+    "can_administer_deployment",
+    "can_administer_system",
+    "can_deploy",
+    "get_deployment_admin_condition",
+    "get_administerable_deployments",
+    "get_system_admin_condition",
+    "get_administerable_systems",
+    "get_administerable_groups",
 ]
 
 
-LOGGER = getLogger('termacls')
+LOGGER = getLogger("termacls")
 
 
-def can_administer_deployment(
-        account: Account,
-        deployment: Deployment
-) -> bool:
+def can_administer_deployment(account: Account, deployment: Deployment) -> bool:
     """Checks whether the respective account
     may administer the given deployment.
     """
 
     try:
-        return get_administerable_deployments(account).where(
-            Deployment.id == deployment
-        ).get()
+        return (
+            get_administerable_deployments(account)
+            .where(Deployment.id == deployment)
+            .get()
+        )
     except Deployment.DoesNotExist:
         return False
 
@@ -48,18 +47,12 @@ def can_administer_system(account: Account, system: System) -> bool:
     """
 
     try:
-        return get_administerable_systems(account).where(
-            System.id == system
-        ).get()
+        return get_administerable_systems(account).where(System.id == system).get()
     except System.DoesNotExist:
         return False
 
 
-def can_deploy(
-        account: Account,
-        system: System,
-        deployment: Deployment
-) -> bool:
+def can_deploy(account: Account, system: System, deployment: Deployment) -> bool:
     """Checks whether the account can deployment
     the respective system at the given deployment.
     """
@@ -87,9 +80,7 @@ def get_admin_types(account: Account) -> Iterator[DeploymentType]:
         yield record.type
 
 
-def get_deployment_admin_condition(
-        account: Account
-) -> Union[Expression, bool]:
+def get_deployment_admin_condition(account: Account) -> Union[Expression, bool]:
     """Returns the condition to administer deployments."""
 
     if account.root:
@@ -134,6 +125,4 @@ def get_administerable_groups(account: Account) -> ModelSelect:
     if account.root:
         return Group.select().where(True)
 
-    return Group.select().join(GroupAdmin).where(
-        GroupAdmin.account == account.id
-    )
+    return Group.select().join(GroupAdmin).where(GroupAdmin.account == account.id)

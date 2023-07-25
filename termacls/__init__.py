@@ -14,14 +14,14 @@ from termacls.orm import GroupAdmin, TypeAdmin
 
 
 __all__ = [
-    'can_administer_deployment',
-    'can_administer_system',
-    'can_deploy',
-    'get_deployment_admin_condition',
-    'get_administerable_deployments',
-    'get_system_admin_condition',
-    'get_administerable_systems',
-    'get_administerable_groups',
-    'GroupAdmin',
-    'TypeAdmin'
+    "can_administer_deployment",
+    "can_administer_system",
+    "can_deploy",
+    "get_deployment_admin_condition",
+    "get_administerable_deployments",
+    "get_system_admin_condition",
+    "get_administerable_systems",
+    "get_administerable_groups",
+    "GroupAdmin",
+    "TypeAdmin",
 ]
